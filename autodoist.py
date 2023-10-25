@@ -1400,7 +1400,7 @@ def autodoist_magic(args, api, connection):
 
                     except:
                         logging.warning(
-                            'Wrong start-date format for task: "%s". Please use "start=<DD-MM-YYYY>"', task.content)
+                            'Wrong start-date format for task: "%s"', task.content)
                         continue
 
                     # Recurring task friendly - remove label with relative change from due date
@@ -1481,7 +1481,7 @@ def main():
     parser.add_argument(
         '-s', '--s_suffix', help='change suffix for sequential labeling (default "-").', default='-')
     parser.add_argument(
-        '-df', '--dateformat', help='strptime() format of starting date (default "%%d-%%m-%%Y").', default='%d-%m-%Y')
+        '-df', '--dateformat', help='Date format of starting date (default "DD-MM-YYYY").', default='DD-MM-YYYY')
     parser.add_argument(
         '-hf', '--hide_future', help='prevent labelling of future tasks beyond a specified number of days.', default=0, type=int)
     parser.add_argument(

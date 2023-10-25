@@ -1365,12 +1365,30 @@ def autodoist_magic(args, api, connection):
 
                     # If start-date has not passed yet, remove label
                     try:
-                        f1 = re.search(
-                            r'start=(\d{2}[-]\d{2}[-]\d{4})', task.content)
+
+                        # When a user inputs a custom dateformat, they will use DD as day, MM as month, YYYY as year
+                        # These values will be used as keys to retrieve a list of [regex, date format code]
+                        # This list will then be used to reconstruct the proper regex search and date formatter below
+                        date_dict = {
+                                'DD': [r'\d{2}', '%d'],
+                                'MM': [r'\d{2}', '%m'],
+                                'YYYY': [r'\d{4}', '%Y']
+                                }
+
+                        # Currently we allow custom dates to be delimitted by '-' only.
+                        # In the future logic could be added to hanlde '.' and '/' delimitters
+                        custom_dateformat = args.dateformat.split("-")
+                        # If there is a cleaner way retrieve the correct value from the dict above I'm all ears.
+                        # For now I've made a tradeoff between readability and verbosity
+                        regex_dateformat = f'{date_dict[custom_dateformat[0]][0]}[-]{date_dict[custom_dateformat[1]][0]}[-]{date_dict[custom_dateformat[2]][0]}'
+                        parsed_dateformat = f'{date_dict[custom_dateformat[0]][1]}-{date_dict[custom_dateformat[1]][1]}-{date_dict[custom_dateformat[2]][1]}'
+
+                        f1 = re.search(f'start=({regex_dateformat})', task.content)
+
                         if f1:
                             start_date = f1.groups()[0]
                             start_date = datetime.strptime(
-                                start_date, args.dateformat)
+                                start_date, parsed_dateformat)
                             future_diff = (
                                 datetime.today()-start_date).days
                             # If start-date hasen't passed, remove all labels
@@ -1382,7 +1400,7 @@ def autodoist_magic(args, api, connection):
 
                     except:
                         logging.warning(
-                            'Wrong start-date format for task: "%s". Please use "start=<DD-MM-YYYY>"', task.content)
+                            'Wrong start-date format for task: "%s"', task.content)
                         continue
 
                     # Recurring task friendly - remove label with relative change from due date
@@ -1463,7 +1481,7 @@ def main():
     parser.add_argument(
         '-s', '--s_suffix', help='change suffix for sequential labeling (default "-").', default='-')
     parser.add_argument(
-        '-df', '--dateformat', help='[CURRENTLY DISABLED FEATURE] strptime() format of starting date (default "%%d-%%m-%%Y").', default='%d-%m-%Y')
+        '-df', '--dateformat', help='Date format of starting date (default "DD-MM-YYYY").', default='DD-MM-YYYY')
     parser.add_argument(
         '-hf', '--hide_future', help='prevent labelling of future tasks beyond a specified number of days.', default=0, type=int)
     parser.add_argument(

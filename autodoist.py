@@ -683,8 +683,8 @@ def remove_label(task, label, overview_task_ids, overview_task_labels):
 def check_header(api, model):
     header_all_in_level = False
     unheader_all_in_level = False
-    regex_a = '(^[*]{2}\s*)(.*)'
-    regex_b = '(^\-\*\s*)(.*)'
+    regex_a = r'(^[*]{2}\s*)(.*)'
+    regex_b = r'(^\-\*\s*)(.*)'
 
     try:
         if isinstance(model, Task):
@@ -1407,7 +1407,7 @@ def autodoist_magic(args, api, connection):
                     if task.due is not None:
                         try:
                             f2 = re.search(
-                                'start=due-(\d+)([dw])', task.content)
+                                r'start=due-(\d+)([dw])', task.content)
 
                             if f2:
                                 offset = f2.groups()[0]
